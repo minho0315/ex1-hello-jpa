@@ -4,6 +4,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.jpa.internal.PersistenceUnitUtilImpl;
 
 import javax.persistence.*;
+import java.util.List;
 
 public class JpaMain {
 
@@ -17,19 +18,20 @@ public class JpaMain {
 
         try {
 
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
             Member member1 = new Member();
             member1.setUsername("hello1");
+            member1.setTeam(team);
             em.persist(member1);
 
             em.flush();
             em.clear();
 
-            Member refMember = em.getReference(Member.class, member1.getId());
-            System.out.println("refMember.getClass() = " + refMember.getClass()); //Proxy
-            refMember.getUsername(); //강제초기화
-//            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember));
-
-            Hibernate.initialize(refMember); //강제초기화
+            List<Member> members = em.createQuery("select m from Member m join fetch m.team", Member.class)
+                    .getResultList();
 
             tx.commit();
         } catch (Exception e) {
