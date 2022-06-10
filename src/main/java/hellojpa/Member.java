@@ -1,9 +1,13 @@
 package hellojpa;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static javax.persistence.CascadeType.ALL;
 
 @Entity
 public class Member {
@@ -15,13 +19,26 @@ public class Member {
     @Column(name = "USERNAME")
     private String username;
 
-    //기간 Period
-    @Embedded
-    private Period workPeriod;
-
     //주소
     @Embedded
-    private Address homAddress;
+    private Address homeAddress;
+
+    @ElementCollection
+    @CollectionTable(name = "FAVORITE_FOOD", joinColumns =
+        @JoinColumn(name = "MEMBER_ID")
+    )
+    @Column(name = "FOOD_NAME")
+    private Set<String> favoriteFoods = new HashSet<>();
+
+//    @ElementCollection
+//    @CollectionTable(name = "ADDRESS", joinColumns =
+//    @JoinColumn(name = "MEMBER_ID")
+//    )
+//    private List<Address> addressHistory = new ArrayList<>();
+
+    @OneToMany(cascade = ALL, orphanRemoval = true)
+    @JoinColumn(name = "MEMBER_ID")
+    private List<AddressEntity> addressHistory = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -39,19 +56,27 @@ public class Member {
         this.username = username;
     }
 
-    public Period getWorkPeriod() {
-        return workPeriod;
+    public Address getHomeAddress() {
+        return homeAddress;
     }
 
-    public void setWorkPeriod(Period workPeriod) {
-        this.workPeriod = workPeriod;
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
     }
 
-    public Address getHomAddress() {
-        return homAddress;
+    public Set<String> getFavoriteFoods() {
+        return favoriteFoods;
     }
 
-    public void setHomAddress(Address homAddress) {
-        this.homAddress = homAddress;
+    public void setFavoriteFoods(Set<String> favoriteFoods) {
+        this.favoriteFoods = favoriteFoods;
+    }
+
+    public List<AddressEntity> getAddressHistory() {
+        return addressHistory;
+    }
+
+    public void setAddressHistory(List<AddressEntity> addressHistory) {
+        this.addressHistory = addressHistory;
     }
 }
